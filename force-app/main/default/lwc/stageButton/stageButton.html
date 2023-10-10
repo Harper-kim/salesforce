@@ -1,0 +1,12 @@
+<template>
+    <lightning-quick-action-panel header="기회 단계">
+        <lightning-record-edit-form record-id={recordId}
+                                    object-api-name={objectApiName}
+                                    onsuccess={handleSuccess}
+                                    onerror={handleErrors}>
+            <lightning-input-field field-name="StageName" onchange={changeHandler}></lightning-input-field>
+            <lightning-button variant="neutral" label="Cancel"></lightning-button>
+            <lightning-button variant="brand" class="slds-m-left_x-small" label="Save" type="submit"></lightning-button>
+        </lightning-record-edit-form>
+    </lightning-quick-action-panel>
+</template>

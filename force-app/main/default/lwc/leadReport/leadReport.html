@@ -1,0 +1,32 @@
+<template>
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered ">
+     <thead>
+      <tr class="slds-line-height_reset">
+       <th class="" scope="col">
+        <div class="slds-truncate" title="">사용자이름</div>
+       </th>
+       <th class="" scope="col">
+        <div class="slds-truncate" title="">리드이름</div>
+       </th>
+      </tr>
+     </thead>
+     <tbody>
+      <template if:true={leReport}>
+       <template for:each={leReport} for:item="UserName">
+        <tr key={UserName.UserName} class="slds-hint-parent">
+         <td data-label="UserName" rowspan={UserName.rowspan}>
+          {UserName.UserName}
+         </td>
+        </tr>
+        <template for:each={UserName.leads} for:item="le">
+         <tr key={le.leName}>
+          <td key={le.leName} data-label="UserName" >
+           {le.leName}
+          </td>
+         </tr>
+        </template>
+       </template>
+      </template>
+     </tbody>
+    </table>
+   </template>
