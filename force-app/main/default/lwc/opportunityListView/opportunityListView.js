@@ -19,6 +19,7 @@ export default class OpportunityListView extends LightningElement {
 
     @track isshowModal = false;
     
+    //실행할 때 순차적으로 하려고 사용connectedCallback
     connectedCallback() {
         this.loadData();
     }
@@ -64,7 +65,7 @@ export default class OpportunityListView extends LightningElement {
     }
 
     async handleSearch(event){
-        if(event.target.value == ""){
+        if(event.target.value == ''){
             this.data = this.baseData
         }else if(event.target.value.length > 1){
             const searchOpps = await searchOpp({searchString: event.target.value})
@@ -74,6 +75,6 @@ export default class OpportunityListView extends LightningElement {
             })
         }
     }
-// test git 
+
     
 }
