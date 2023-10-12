@@ -2,8 +2,12 @@ import { LightningElement, track, wire } from 'lwc';
 import generateData from '@salesforce/apex/OpportunityController.generateData';
 import searchOpp from '@salesforce/apex/OpportunityController.searchOpp';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import recentlyView from '@salesforce/apex/OpportunityController.searchOpp';
+import recentlyView from '@salesforce/apex/OpportunityController.recentlyView';
 
+import deleteOpportunitys from '@salesforce/apex/OpportunityController.deleteOpportunitys';
+import Name from '@salesforce/schema/Account.Name';
+const ACTIONS = [{label: 'Edit', name: 'edit'},
+                {label: 'Delete', name: 'delete'}]
 
 const columns = [
     {label: 'Name', fieldName: 'link', type: 'url', typeAttributes: { label: {fieldName: 'Name'}}},
@@ -12,7 +16,8 @@ const columns = [
     {label: 'Amount', fieldName: 'Amount', type: 'currency'},
     {label: 'Stage', fieldName: 'StageName', type: 'text'},
     {label: 'userName', fieldName: 'UserName__c', type: 'text'},
-    {label: 'closeDate', fieldName: 'CloseDate'}
+    {label: 'closeDate', fieldName: 'CloseDate'},
+    {fieldName: 'actions', type: 'action', typeAttributes: {rowActions: ACTIONS}}
 ];
 
 
@@ -22,36 +27,17 @@ export default class OpportunityListView extends LightningElement {
     baseData;
     error;
     wiredOpportunitys;
+    selectedOpportunitys;
 
+    
     @track isshowModal = false;
 
+    value = 'all';
     filterOptions = [
         {label: 'All Opportunity', value: 'all'},
         {label: 'Recently Viewed', value: 'recent'}
     ]
     
-    // //실행할 때 순차적으로 하려고 사용connectedCallback
-    // connectedCallback() {
-    //     //this.contactsWire();
-    //     this.loadData();
-    // }
-
-    // loadData(){
-    //     return generateData()
-    //     .then(result => {
-    //         this.data = result.data.map((row) => {
-    //             return this.mapOpps(row);
-    //         })
-    //         console.log('this.data' +this.data);
-    //         this.baseData = this.data;
-    //         console.log('this.baseData' +this.baseData);
-    //         //this.error = undefined;
-    //     })
-    //     .catch(error => {
-    //         this.error = error;
-    //         this.data = undefined;
-    //     })
-    // }
 
     //전체데이터 불러오기
     async connectedCallback(){
@@ -67,33 +53,31 @@ export default class OpportunityListView extends LightningElement {
     }
     //검색된 데이터만 보기
     async search(){
-
         const searchOppos = await searchOpp({searchString: event.target.value});
-
         this.oppdata = searchOppos.map(row =>{
-
             return this.mapOpps(row);
-
         });
     }
 
+    //최근 본 데이터
     async viewRecent(){
-        const recent = await recentlyView();
-        this.oppdata = recent.map(row => {
+        const result = await recentlyView();
+        this.oppdata = result.map(row => {
             return this.mapOpps(row);
         });
     }
 
-    handleFilterChange(event){
-        this.selectedFilter = event.target.value;
-        if(this.selectedFilter == 'recent'){
-            this.viewRecent();
-        }else{
-            this.viewAll();
+    //필터
+    async handleFilterChange(event){
+        console.log(event.target.value);
+        //this.selectedFilter = event.target.value;
+        this.value = event.target.value;
+        if(this.value == 'recent'){
+            await this.viewRecent();
+        }else if(this.value == 'all'){
+            await this.viewAll();
         }
     }
-
-    
 
      //매핑시켜주는 
      mapOpps(row){
@@ -113,6 +97,7 @@ export default class OpportunityListView extends LightningElement {
 
     //검색
     async handleSearch(event){
+        //이벤트가 발생하지 않았을 때 
         if(!event.target.value){
             await this.viewAll();
         }else{
@@ -142,6 +127,49 @@ export default class OpportunityListView extends LightningElement {
         );
         this.closeModalBox(event);
     }
+
+    
+    //편집 삭제 handler
+    handleRowAction(event){
+        let actionName = event.detail.action.name;
+        //console.log('actionName : ' +actionName);
+        let row = event.detail.row;
+        //console.log('row : '+row);
+        switch(actionName){
+            case 'edit':
+                this.editCurrentRecord(row);
+                break;
+            case 'delete':
+                this.deleteOpps(row);
+                break;
+        }
+    }
+
+    //삭제
+    deleteOpps(oppName) {
+        let oppRecord = [];
+        oppRecord.push(oppName.Id);
+        deleteOpportunitys({OppIds: oppRecord})
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: oppName.Name + ' 를 삭제하였습니다.',
+                    variant: 'success'
+        }),);
+    }
+
+    
+
+
+
+    
+
+    
+
+
+  
+
+
 
     
 
