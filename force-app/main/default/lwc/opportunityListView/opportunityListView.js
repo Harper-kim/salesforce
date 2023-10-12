@@ -6,8 +6,8 @@ import recentlyView from '@salesforce/apex/OpportunityController.recentlyView';
 
 import deleteOpportunitys from '@salesforce/apex/OpportunityController.deleteOpportunitys';
 import Name from '@salesforce/schema/Account.Name';
-const ACTIONS = [{label: 'Edit', name: 'edit'},
-                {label: 'Delete', name: 'delete'}]
+const ACTIONS = [{label: 'Edit', value: 'edit'},
+                {label: 'Delete', value: 'delete'}]
 
 const columns = [
     {label: 'Name', fieldName: 'link', type: 'url', typeAttributes: { label: {fieldName: 'Name'}}},
@@ -128,35 +128,55 @@ export default class OpportunityListView extends LightningElement {
         this.closeModalBox(event);
     }
 
-    
-    //편집 삭제 handler
-    handleRowAction(event){
-        let actionName = event.detail.action.name;
-        //console.log('actionName : ' +actionName);
-        let row = event.detail.row;
-        //console.log('row : '+row);
-        switch(actionName){
-            case 'edit':
-                this.editCurrentRecord(row);
-                break;
-            case 'delete':
-                this.deleteOpps(row);
-                break;
-        }
-    }
 
+    //편집 삭제 handler
+    async handleRowAction(event){
+        if(event.detail.action.value == 'delete'){
+            await deleteOpportunitys({OppIds: [event.detail.row.Id]});
+            this.deleteOpps();
+        }
+        // else if(event.detail.action.value == 'edit'){
+        //     this.editCurrentRecord(row);
+        // }
+    }
     //삭제
-    deleteOpps(oppName) {
-        let oppRecord = [];
-        oppRecord.push(oppName.Id);
-        deleteOpportunitys({OppIds: oppRecord})
+    deleteOpps() {  
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Success',
-                    message: oppName.Name + ' 를 삭제하였습니다.',
+                    message: '리드를 삭제하였습니다.',
                     variant: 'success'
         }),);
     }
+
+    // //삭제
+    // deleteOpps(oppName) {
+    //     let oppRecord = [];
+    //     oppRecord.push(oppName.Id);
+    //     deleteOpportunitys({OppIds: oppRecord})
+    //         this.dispatchEvent(
+    //             new ShowToastEvent({
+    //                 title: 'Success',
+    //                 message: '리드를 삭제하였습니다.',
+    //                 variant: 'success'
+    //     }),);
+    // }
+
+    // //편집 삭제 handler
+    // handleRowAction(event){
+    //     let actionName = event.detail.action.name;
+    //     //console.log('actionName : ' +actionName);
+    //     let row = event.detail.row;
+    //     //console.log('row : '+row);
+    //     switch(actionName){
+    //         case 'edit':
+    //             this.editCurrentRecord(row);
+    //             break;
+    //         case 'delete':
+    //             this.deleteOpps(row);
+    //             break;
+    //     }
+    // }
 
     
 
