@@ -8,3 +8,6 @@
 string tempvar = 'Enter_your_name_here';
 System.debug('Hello World!');
 System.debug('My name is ' + tempvar);
+
+String searchKeyword = '%샘%';
+System.debug([SELECT Id, Name, AccountId, Amount,StageName, UserName__c FROM Opportunity WHERE Name LIKE :searchKeyword LIMIT 30]);

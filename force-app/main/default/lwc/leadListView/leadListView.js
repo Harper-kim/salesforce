@@ -170,10 +170,7 @@ export default class leadListView extends LightningElement {
         this.availableLeads = this.records;
     }
 
-    // 전체 목록 보기
-    showAllList() {
-        this.availableLeads = this.initialRecords;
-    }
+    
 
     
 }

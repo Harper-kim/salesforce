@@ -10,7 +10,7 @@ public with sharing class contactListViewHelper {
 
     @AuraEnabled(cacheable=True)
     public static List<Contact> searchContact(String searchString){
-        List<List<SObject>> contacts = [FIND :searchString IN ALL FIELDS RETURNING Contact(FirstName, LastName, Email, mailingStreet,
+        List<List<SObject>> contacts = [FIND :searchString IN Name FIELDS RETURNING Contact(FirstName, LastName, Email, mailingStreet,
         mailingCity, mailingCountry, mailingPostalCode, account.Name)];
 
         return (List<Contact>) contacts[0];
