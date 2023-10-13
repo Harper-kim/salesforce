@@ -31,11 +31,11 @@
         </div>
     </lightning-card>
 
-    <!-- 모달 시작 -->
+    <!-- NEW 모달 시작 -->
     <template if:true={isshowModal}>
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
-                <!-- 모달 헤더 -->
+                <!-- NEW 모달 헤더 -->
                 <header class="slds-modal__header">
                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalBox}> 
                         <lightning-icon icon-name="utility:close"
@@ -46,32 +46,19 @@
                     </button>
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Opportunity</h2>
                 </header>
-                <!-- 모달 바디 -->
-                <div class="slds-modal__content slds-p-around_medium " id="modal-content-id-1">
-                        <h2 style="background-color: rgb(229, 229, 229); font-size: large; margin-bottom: 10px;">Opportunity Information</h2>
-                        <lightning-record-edit-form object-api-name="Opportunity" onsuccess={handleSuccess}>
-                            <!--Id, Name, AccountId, Amount,StageName, UserName__c-->
-                            <lightning-input-field field-name="UserName__c" >
-                            </lightning-input-field>
-                            <lightning-input-field field-name="Name">
-                            </lightning-input-field>
-                            <lightning-input-field field-name="AccountId">
-                            </lightning-input-field>
-                            <lightning-input-field field-name="Amount">
-                            </lightning-input-field>
-                            <lightning-input-field field-name="StageName">
-                            </lightning-input-field>
-                            <lightning-input-field field-name="CloseDate">
-                            </lightning-input-field>
-                            <!-- 모달 풋터-->
-                            <footer class="slds-modal__footer">
-                                <lightning-button class="slds-m-top_small" variant="brand" type="submit" name="update" label="Save"></lightning-button>
-                                <lightning-button class="slds-m-top_small" variant="brand" type="cancel" name="cancel" label="Cancel" onclick={closeModalBox}></lightning-button>
-                            </footer>    
-                        </lightning-record-edit-form>
+                <!-- NEW 모달 바디 -->
+                <div>
+                    <lightning-input type="text" label="Name"></lightning-input>
+                    <lightning-input type="date" label="CloseDate"></lightinint-input>
+                    <lightning-input type="StageName" label="Stge"></lightning-input>
+                    <footer class="slds-modal__footer">
+                        <lightning-button class="slds-m-top_small" variant="brand" type="submit" name="update" label="Save"></lightning-button>
+                        <lightning-button class="slds-m-top_small" variant="brand" type="cancel" name="cancel" label="Cancel" onclick={closeModalBox}></lightning-button>
+                    </footer> 
                 </div>
-            </div>
+            </div>    
         </section>
     </template>
+    <!-- 모달 끝 -->
     </div>
 </template>

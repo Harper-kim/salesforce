@@ -66,7 +66,6 @@
                                              label="Update Record"></lightning-button>
                        </div>
                    </lightning-record-edit-form><br/>
-                   <div></div>
                </div>
 
                <!-- modal footer start-->
@@ -83,3 +82,22 @@
        </template>
    </lightning-card>   
 </template>
+<!--lightning-record-edit-form object-api-name="Opportunity" onsubmit={handleSuccess} onsuccess={handlerefresh}>
+    <Id, Name, AccountId, Amount,StageName, UserName__c>
+    <lightning-output-field field-name="UserName__c" >
+    </lightning-output-field>
+    <lightning-input-field field-name="Name">
+    </lightning-input-field>
+    <lightning-input-field field-name="AccountId">
+    </lightning-input-field>
+    <lightning-input-field field-name="Amount">
+    </lightning-input-field>
+    <lightning-input-field field-name="StageName">
+    </lightning-input-field>
+    <lightning-input-field field-name="CloseDate">
+    </lightning-input-field>
+    <footer class="slds-modal__footer">
+        <lightning-button class="slds-m-top_small" variant="brand" type="submit" name="update" label="Save"></lightning-button>
+        <lightning-button class="slds-m-top_small" variant="brand" type="cancel" name="cancel" label="Cancel" onclick={closeModalBox}></lightning-button>
+    </footer>    
+</lightning-record-edit-form-->

@@ -28,6 +28,15 @@ public with sharing class OpportunityController {
                 delete oppToDelete;
             }
     }
+
+    @AuraEnabled
+    public static Opportunity createOpp(Opportunity idOpp){
+        insert idOpp;
+        return idOpp;
+        
+    }
+
+    
     
 
     

@@ -5,7 +5,11 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import recentlyView from '@salesforce/apex/OpportunityController.recentlyView';
 
 import deleteOpportunitys from '@salesforce/apex/OpportunityController.deleteOpportunitys';
+import updateOpportunitys from '@salesforce/apex/OpportunityController.updateOpportunitys';
 import Name from '@salesforce/schema/Account.Name';
+
+import {refreshApex} from '@salesforce/apex';
+
 const ACTIONS = [{label: 'Edit', value: 'edit'},
                 {label: 'Delete', value: 'delete'}]
 
@@ -31,6 +35,11 @@ export default class OpportunityListView extends LightningElement {
 
     
     @track isshowModal = false;
+    @track isEditForm = false;
+    @track rocord = [];
+    @track currentRecordId;
+
+    refreshTable;
 
     value = 'all';
     filterOptions = [
@@ -47,6 +56,7 @@ export default class OpportunityListView extends LightningElement {
     //전체보기
     async viewAll(){
         const result = await generateData();
+        this.refreshTable = result;
         this.oppdata = result.map(row => {
             return this.mapOpps(row);
         }) 
@@ -105,23 +115,39 @@ export default class OpportunityListView extends LightningElement {
             await this.search();
         }
     }
-    
-    //모달창 열기
-    showModalBox(){
+
+    //new모달창 열기
+    showModalBox(currentRow){
         this.isshowModal = true;
+        this.isEditForm = false;
+        this.record = currentRow;
+        
     }
 
-    //모달창 닫기
+    //new모달창 닫기
     closeModalBox(){
         this.isshowModal = false;
     }
-    
+
+    //edit모달 열기
+    editModalBox(currentRow){
+        this.isEditForm = true;
+    }
+    //edit모달창 닫기
+    editCloseModalBox(){
+        this.isEditForm = false;
+    }
+
+    handlerefresh() {
+        return refreshApex(this.refreshTable);
+    }
+
     //New에서 Save할 경우
     handleSuccess(event){
         this.dispatchEvent(
             new ShowToastEvent({
                 title: 'Success',
-                message: '리드가 생성되었습니다',
+                message: '기회가 생성되었습니다',
                 variant: 'success'
             })
         );
@@ -135,19 +161,47 @@ export default class OpportunityListView extends LightningElement {
             await deleteOpportunitys({OppIds: [event.detail.row.Id]});
             this.deleteOpps();
         }
-        // else if(event.detail.action.value == 'edit'){
-        //     this.editCurrentRecord(row);
-        // }
+        else if(event.detail.action.value == 'edit'){
+            this.editModalBox();
+            this.editOpps();
+        }
     }
+
     //삭제
     deleteOpps() {  
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Success',
-                    message: '리드를 삭제하였습니다.',
-                    variant: 'success'
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: 'Success',
+                message: '기회를 삭제하였습니다.',
+                variant: 'success'
         }),);
     }
+
+    //편집
+    editOpps(event){
+        event.preventDefault();
+        this.template.querySelector('lightning-record-edit-form').submit(event.detail.fields);
+        this.isshowModal = false;
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: 'Success',
+                message: '기회가 업데이트되었습니다',
+                variant: 'success'
+            })
+        );    
+    }
+
+    handleRowAction(event){
+        const row = event.detail.row;
+        this.record = row;
+        this.isshowModal = true;
+        this.editCurrentRecord(row);
+    }
+    editCurrentRecord(currentRow){
+        this.currentRecordId = currentRow.Id;
+    }
+
+    
 
     // //삭제
     // deleteOpps(oppName) {
