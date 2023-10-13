@@ -48,12 +48,16 @@
                 </header>
                 <!-- NEW 모달 바디 -->
                 <div>
-                    <lightning-input type="text" label="Name"></lightning-input>
-                    <lightning-input type="date" label="CloseDate"></lightinint-input>
-                    <lightning-input type="StageName" label="Stge"></lightning-input>
+                    <lightning-input type="text" label="Name" onchange={handleName} value=""></lightning-input>
+                    <lightning-input type="date" label="CloseDate" onchange={handleName}></lightinint-input>
+                    <lightning-combobox
+                      label="StageName"
+                      value={value}
+                      options={options}
+                      onchange={handleStage}
+                    ></lightning-combobox>
                     <footer class="slds-modal__footer">
-                        <lightning-button class="slds-m-top_small" variant="brand" type="submit" name="update" label="Save"></lightning-button>
-                        <lightning-button class="slds-m-top_small" variant="brand" type="cancel" name="cancel" label="Cancel" onclick={closeModalBox}></lightning-button>
+                        <lightning-button class="slds-m-top_small" variant="brand" name="update" label="Save" onclick={handleClick}></lightning-button>
                     </footer> 
                 </div>
             </div>    

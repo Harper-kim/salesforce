@@ -30,11 +30,18 @@ public with sharing class OpportunityController {
     }
 
     @AuraEnabled
-    public static Opportunity createOpp(Opportunity idOpp){
-        insert idOpp;
-        return idOpp;
-        
+    public static void insertRecord(String name, String stageName, Date closeDate){
+        Opportunity oppObj = new Opportunity();
+        oppObj.Name = name;
+        oppObj.stageName = stageName;
+        oppObj.closeDate = closeDate;
+
+        insert oppObj;
     }
+    
+       
+        
+    
 
     
     

@@ -5,8 +5,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import recentlyView from '@salesforce/apex/OpportunityController.recentlyView';
 
 import deleteOpportunitys from '@salesforce/apex/OpportunityController.deleteOpportunitys';
-import updateOpportunitys from '@salesforce/apex/OpportunityController.updateOpportunitys';
-import Name from '@salesforce/schema/Account.Name';
+import insertRecord from '@salesforce/apex/OpportunityController.insertRecord';
 
 import {refreshApex} from '@salesforce/apex';
 
@@ -36,16 +35,34 @@ export default class OpportunityListView extends LightningElement {
     
     @track isshowModal = false;
     @track isEditForm = false;
-    @track rocord = [];
-    @track currentRecordId;
 
-    refreshTable;
+    recordId;
+    Name;
+    stageName;
+    closeDate;
+
+
+
+    createOpp(event){
+        Name = event.target.value;
+
+    }
+
+    //1
+
 
     value = 'all';
     filterOptions = [
         {label: 'All Opportunity', value: 'all'},
         {label: 'Recently Viewed', value: 'recent'}
     ]
+    options = [
+        {lable: 'closedWon', value: 'closedWon'},
+        {label: 'closedLost', value: 'closedLost'}
+    ]
+    connectedCallback(){
+        recordId
+    }
     
 
     //전체데이터 불러오기
@@ -191,15 +208,7 @@ export default class OpportunityListView extends LightningElement {
         );    
     }
 
-    handleRowAction(event){
-        const row = event.detail.row;
-        this.record = row;
-        this.isshowModal = true;
-        this.editCurrentRecord(row);
-    }
-    editCurrentRecord(currentRow){
-        this.currentRecordId = currentRow.Id;
-    }
+
 
     
 
