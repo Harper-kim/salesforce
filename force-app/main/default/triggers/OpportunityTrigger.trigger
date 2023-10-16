@@ -7,6 +7,8 @@ trigger OpportunityTrigger on Opportunity (before update,before insert) {
             for(Opportunity newTriggerObj : Trigger.new){
                 Opportunity oldTriggerObj = Trigger.oldMap.get(newTriggerObj.id);
 
+                
+                
                 //이전단계로 이동 불가 
                 if(newTriggerObj.StageName != oldTriggerObj.StageName || newTriggerObj.CustomStageName__c != oldTriggerObj.CustomStageName__c){
                     List<String> stageOrder = new List<String>{'Qualification','Needs Analysis','Value Proposition','Id. Decision Makers'
@@ -24,8 +26,7 @@ trigger OpportunityTrigger on Opportunity (before update,before insert) {
                 }  
 
     
-                //금액 없으면 'Proposal/Price Quote' 단계 이동 불가 
-                if(newTriggerObj.StageName != null ){
+                if(newTriggerObj.StageName != null){
                     if((newTriggerObj.StageName == 'Proposal/Price Quote' || newTriggerObj.CustomStageName__c == 'Proposal/Price Quote') && newTriggerObj.Amount == null){
                         newTriggerObj.addError('금액을 입력해주세요');
                     }

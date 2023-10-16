@@ -32,4 +32,3 @@ public class CreateAccountControllerTest {
         System.assertEquals(0, accList.size(), 'Account list is empty');
     }
 }
-    

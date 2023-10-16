@@ -47,19 +47,55 @@
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Opportunity</h2>
                 </header>
                 <!-- NEW 모달 바디 -->
-                <div>
-                    <lightning-input type="text" label="Name" onchange={handleName} value=""></lightning-input>
-                    <lightning-input type="date" label="CloseDate" onchange={handleName}></lightinint-input>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-input type="text" label="Name" onchange={handleNameChange}></lightning-input>
+                    <lightning-input type="date" label="CloseDate" onchange={handleCloseDateChange}></lightning-input>
                     <lightning-combobox
                       label="StageName"
                       value={value}
                       options={options}
-                      onchange={handleStage}
+                      onchange={handleStageNameChange}
                     ></lightning-combobox>
-                    <footer class="slds-modal__footer">
-                        <lightning-button class="slds-m-top_small" variant="brand" name="update" label="Save" onclick={handleClick}></lightning-button>
-                    </footer> 
                 </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button class="slds-m-top_small" variant="brand" name="update" label="Save" onclick={createOpp}></lightning-button>
+                    <lightning-button class="slds-m-top_small" variant="brand" name="cancel" label="cancel" onclick={closeModalBox}></lightning-button>
+                </footer> 
+            </div>    
+        </section>
+    </template>
+    <!-- 모달 끝 -->
+
+    <!-- NEW 모달 시작 -->
+    <template if:true={isEditModal}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- NEW 모달 헤더 -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={editCloseModalBox}> 
+                        <lightning-icon icon-name="utility:close"
+                        alternative-text="close"
+                        variant="inverse"
+                        size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">New Opportunity</h2>
+                </header>
+                <!-- NEW 모달 바디 -->
+                <div class="slds-modal__content slds-p-around_medium" id={id}>
+                    <lightning-input type="text" label="Name" value={name}></lightning-input>
+                    <lightning-input type="date" label="CloseDate" value={closeDate}></lightning-input>
+                    <lightning-combobox
+                      label="StageName"
+                      value={value}
+                      options={options}
+                      value={stageName}
+                    ></lightning-combobox>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button class="slds-m-top_small" variant="brand" name="update" label="Save" onclick={editOpps}></lightning-button>
+                    <lightning-button class="slds-m-top_small" variant="brand" name="cancel" label="cancel" onclick={editCloseModalBox}></lightning-button>
+                </footer> 
             </div>    
         </section>
     </template>

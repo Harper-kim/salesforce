@@ -32,19 +32,21 @@ public with sharing class OpportunityController {
     @AuraEnabled
     public static void insertRecord(String name, String stageName, Date closeDate){
         Opportunity oppObj = new Opportunity();
-        oppObj.Name = name;
+        oppObj.name = name;
         oppObj.stageName = stageName;
         oppObj.closeDate = closeDate;
 
         insert oppObj;
     }
-    
-       
-        
-    
 
-    
-    
+    @AuraEnabled
+    public static void updateRecord(String opportunityId, String newStageName, Date closeDate){
+        Opportunity oppUpObj = [SELECT Id, name, StageName, closeDate FROM Opportunity WHERE Id = :opportunityId];
+        oppUpObj.name = name;
+        oppUpObj.stageName = stageName;
+        oppUpObj.closeDate = closeDate;
 
-    
+       update oppToUPdate;
+    }
+
 }

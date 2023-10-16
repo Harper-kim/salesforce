@@ -4,9 +4,11 @@ import searchOpp from '@salesforce/apex/OpportunityController.searchOpp';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import recentlyView from '@salesforce/apex/OpportunityController.recentlyView';
 
-import deleteOpportunitys from '@salesforce/apex/OpportunityController.deleteOpportunitys';
 import insertRecord from '@salesforce/apex/OpportunityController.insertRecord';
+import deleteOpportunitys from '@salesforce/apex/OpportunityController.deleteOpportunitys';
+import updateRecord from '@salesforce/apex/OpportunityController.updateRecord';
 
+import { NavigationMixin } from 'lightning/navigation';
 import {refreshApex} from '@salesforce/apex';
 
 const ACTIONS = [{label: 'Edit', value: 'edit'},
@@ -15,7 +17,6 @@ const ACTIONS = [{label: 'Edit', value: 'edit'},
 const columns = [
     {label: 'Name', fieldName: 'link', type: 'url', typeAttributes: { label: {fieldName: 'Name'}}},
     {label: 'Account', fieldName: "AccountLink", type: 'url', typeAttributes: {label: {fieldName: 'AccountName'}}},
-    //{label: 'Account', fieldName: "AccountId", type: 'text'},
     {label: 'Amount', fieldName: 'Amount', type: 'currency'},
     {label: 'Stage', fieldName: 'StageName', type: 'text'},
     {label: 'userName', fieldName: 'UserName__c', type: 'text'},
@@ -24,7 +25,7 @@ const columns = [
 ];
 
 
-export default class OpportunityListView extends LightningElement {
+export default class OpportunityListView extends NavigationMixin(LightningElement) {
     oppdata;
     columns = columns;
     baseData;
@@ -37,31 +38,60 @@ export default class OpportunityListView extends LightningElement {
     @track isEditForm = false;
 
     recordId;
-    Name;
-    stageName;
-    closeDate;
+
+    @track Name;
+    @track StageName;
+    @track CloseDate;
 
 
-
-    createOpp(event){
-        Name = event.target.value;
-
-    }
-
-    //1
-
-
+    //필터
     value = 'all';
     filterOptions = [
         {label: 'All Opportunity', value: 'all'},
         {label: 'Recently Viewed', value: 'recent'}
     ]
+
+    //새로만들기 stageName 옵션
     options = [
-        {lable: 'closedWon', value: 'closedWon'},
+        {label: 'closedWon', value: 'closedWon'},
         {label: 'closedLost', value: 'closedLost'}
     ]
-    connectedCallback(){
-        recordId
+    
+    //새로 만들기
+    handleNameChange(event){
+        this.Name = event.target.value;
+    }
+
+    handleStageNameChange(event){
+        this.StageName = event.target.value;
+    }
+
+    handleCloseDateChange(event){
+        this.CloseDate = event.target.value;
+    }
+
+    //새로 만들기
+    createOpp(){
+        insertRecord({
+            name : this.Name,
+            stageName: this.StageName,
+            closeDate: this.CloseDate
+        })
+        .then(result => {
+           this.handleSuccess();
+        })
+    }
+
+    //New에서 Save할 경우
+    handleSuccess(event){
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: 'Success',
+                message: '기회가 생성되었습니다',
+                variant: 'success'
+            })
+        );
+        this.closeModalBox(event);
     }
     
 
@@ -136,9 +166,6 @@ export default class OpportunityListView extends LightningElement {
     //new모달창 열기
     showModalBox(currentRow){
         this.isshowModal = true;
-        this.isEditForm = false;
-        this.record = currentRow;
-        
     }
 
     //new모달창 닫기
@@ -148,27 +175,11 @@ export default class OpportunityListView extends LightningElement {
 
     //edit모달 열기
     editModalBox(currentRow){
-        this.isEditForm = true;
+        this.isEditModal = true;
     }
     //edit모달창 닫기
     editCloseModalBox(){
-        this.isEditForm = false;
-    }
-
-    handlerefresh() {
-        return refreshApex(this.refreshTable);
-    }
-
-    //New에서 Save할 경우
-    handleSuccess(event){
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Success',
-                message: '기회가 생성되었습니다',
-                variant: 'success'
-            })
-        );
-        this.closeModalBox(event);
+        this.isEditModal = false;
     }
 
 
@@ -179,6 +190,7 @@ export default class OpportunityListView extends LightningElement {
             this.deleteOpps();
         }
         else if(event.detail.action.value == 'edit'){
+            await updateRecord({});
             this.editModalBox();
             this.editOpps();
         }
@@ -194,23 +206,29 @@ export default class OpportunityListView extends LightningElement {
         }),);
     }
 
+    
+
     //편집
-    editOpps(event){
-        event.preventDefault();
-        this.template.querySelector('lightning-record-edit-form').submit(event.detail.fields);
-        this.isshowModal = false;
+    editOpps(){
         this.dispatchEvent(
             new ShowToastEvent({
                 title: 'Success',
-                message: '기회가 업데이트되었습니다',
+                message: '기회를 업데이트하였습니다.',
                 variant: 'success'
-            })
-        );    
+            }),);
     }
 
-
-
-    
+    //상세 페이지로 이동
+    // navigateToOpportunityDetail(opportunityId) {
+    //     this[NavigationMixin.Navigate]({
+    //         type: 'standard__recordPage',
+    //         attributes: {
+    //             recordId: opportunityId,
+    //             objectApiName: 'Opportunity',
+    //             actionName: 'view'
+    //         }
+    //     });
+    // }
 
     // //삭제
     // deleteOpps(oppName) {
@@ -240,23 +258,5 @@ export default class OpportunityListView extends LightningElement {
     //             break;
     //     }
     // }
-
-    
-
-
-
-    
-
-    
-
-
-  
-
-
-
-    
-
-
-
     
 }

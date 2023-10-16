@@ -1,0 +1,22 @@
+<template>
+    <div class="all container" >
+        <lightning-card title="TirelistView" icon-name="standard:Lead">
+            <div class="slds-card__body_inner">
+                <!-- 검색 창 -->
+                <div class="slds-grid slds-gutters slds-p-bottom_x-small slds-p-left_x-small" style="margin-left: 10px;">
+                    <lightning-input type="search" onchange={handleSearch}></lightning-input>
+                </div>
+                <!-- 데이터 테이블 -->
+                    <lightning-datatable
+                        key-field="id"
+                        data={data}
+                        columns={colums}
+                        show-row-number-column="true"
+                        show-checkbox-column="true"
+                        onrowselection={handleRowSelection}
+                        onrowaction={handleRowAction}>    
+                    </lightning-datatable>            
+            </div>
+        </lightning-card>
+    </div>
+</template>

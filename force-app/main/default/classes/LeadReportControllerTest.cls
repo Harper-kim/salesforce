@@ -1,5 +1,4 @@
 @isTest
-Run All Tests|Debug All Tests
 public class LeadReportControllerTest {
     
     @isTest
@@ -10,7 +9,7 @@ public class LeadReportControllerTest {
         lead.FirstName = '민정';
         lead.LastName = '킴';
         testLeads.add(lead);
-
+        
         insert testLeads;
 
         Test.startTest();
