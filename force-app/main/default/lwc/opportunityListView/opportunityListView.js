@@ -1,18 +1,21 @@
-import { LightningElement, track, wire } from 'lwc';
-import generateData from '@salesforce/apex/OpportunityController.generateData';
-import searchOpp from '@salesforce/apex/OpportunityController.searchOpp';
+import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
+import generateData from '@salesforce/apex/OpportunityController.generateData';
+
 import recentlyView from '@salesforce/apex/OpportunityController.recentlyView';
+import searchOpp from '@salesforce/apex/OpportunityController.searchOpp';
 
 import insertRecord from '@salesforce/apex/OpportunityController.insertRecord';
 import deleteOpportunitys from '@salesforce/apex/OpportunityController.deleteOpportunitys';
-import updateRecord from '@salesforce/apex/OpportunityController.updateRecord';
+import getOppInfo from '@salesforce/apex/OpportunityController.getOppInfo';
+import updateOpportunitys from '@salesforce/apex/OpportunityController.updateOpportunitys';
 
 import { NavigationMixin } from 'lightning/navigation';
 import {refreshApex} from '@salesforce/apex';
 
-const ACTIONS = [{label: 'Edit', value: 'edit'},
-                {label: 'Delete', value: 'delete'}]
+const ACTIONS = [{label: 'edit', value: 'edit'},
+                {label: 'delete', value: 'delete'}]
 
 const columns = [
     {label: 'Name', fieldName: 'link', type: 'url', typeAttributes: { label: {fieldName: 'Name'}}},
@@ -35,9 +38,8 @@ export default class OpportunityListView extends NavigationMixin(LightningElemen
 
     
     @track isshowModal = false;
-    @track isEditForm = false;
+    @track isEditModal = false;
 
-    recordId;
 
     @track Name;
     @track StageName;
@@ -96,8 +98,8 @@ export default class OpportunityListView extends NavigationMixin(LightningElemen
     
 
     //전체데이터 불러오기
-    async connectedCallback(){
-      await this.viewAll();
+     connectedCallback(){
+       this.viewAll();
      }
 
     //전체보기
@@ -109,30 +111,30 @@ export default class OpportunityListView extends NavigationMixin(LightningElemen
         }) 
     }
     //검색된 데이터만 보기
-    async search(){
-        const searchOppos = await searchOpp({searchString: event.target.value});
+     search(){
+        const searchOppos =  searchOpp({searchString: event.target.value});
         this.oppdata = searchOppos.map(row =>{
             return this.mapOpps(row);
         });
     }
 
     //최근 본 데이터
-    async viewRecent(){
-        const result = await recentlyView();
+     viewRecent(){
+        const result =  recentlyView();
         this.oppdata = result.map(row => {
             return this.mapOpps(row);
         });
     }
 
     //필터
-    async handleFilterChange(event){
+     handleFilterChange(event){
         console.log(event.target.value);
         //this.selectedFilter = event.target.value;
         this.value = event.target.value;
         if(this.value == 'recent'){
-            await this.viewRecent();
+             this.viewRecent();
         }else if(this.value == 'all'){
-            await this.viewAll();
+             this.viewAll();
         }
     }
 
@@ -153,18 +155,18 @@ export default class OpportunityListView extends NavigationMixin(LightningElemen
     }
 
     //검색
-    async handleSearch(event){
+     handleSearch(event){
         //이벤트가 발생하지 않았을 때 
         if(!event.target.value){
-            await this.viewAll();
+             this.viewAll();
         }else{
             console.log(event.target.value);
-            await this.search();
+             this.search();
         }
     }
 
     //new모달창 열기
-    showModalBox(currentRow){
+    showModalBox(){
         this.isshowModal = true;
     }
 
@@ -174,7 +176,7 @@ export default class OpportunityListView extends NavigationMixin(LightningElemen
     }
 
     //edit모달 열기
-    editModalBox(currentRow){
+    editModalBox(){
         this.isEditModal = true;
     }
     //edit모달창 닫기
@@ -184,19 +186,23 @@ export default class OpportunityListView extends NavigationMixin(LightningElemen
 
 
     //편집 삭제 handler
-    async handleRowAction(event){
+     handleRowAction(event){
+        
         if(event.detail.action.value == 'delete'){
-            await deleteOpportunitys({OppIds: [event.detail.row.Id]});
+             deleteOpportunitys({OppIds: [event.detail.row.Id]});
             this.deleteOpps();
         }
         else if(event.detail.action.value == 'edit'){
-            await updateRecord({});
+            const response =  getOppInfo({opportunityId : event.detail.row.Id});
+                this.id = response.Id;
+                this.Name = response.Name;
+                this.StageName = response.StageName;
+                this.CloseDate = response.CloseDate;
             this.editModalBox();
-            this.editOpps();
         }
     }
 
-    //삭제
+    //삭제 메세지
     deleteOpps() {  
         this.dispatchEvent(
             new ShowToastEvent({
@@ -208,7 +214,7 @@ export default class OpportunityListView extends NavigationMixin(LightningElemen
 
     
 
-    //편집
+    //편집 메세지
     editOpps(){
         this.dispatchEvent(
             new ShowToastEvent({
@@ -228,35 +234,6 @@ export default class OpportunityListView extends NavigationMixin(LightningElemen
     //             actionName: 'view'
     //         }
     //     });
-    // }
-
-    // //삭제
-    // deleteOpps(oppName) {
-    //     let oppRecord = [];
-    //     oppRecord.push(oppName.Id);
-    //     deleteOpportunitys({OppIds: oppRecord})
-    //         this.dispatchEvent(
-    //             new ShowToastEvent({
-    //                 title: 'Success',
-    //                 message: '리드를 삭제하였습니다.',
-    //                 variant: 'success'
-    //     }),);
-    // }
-
-    // //편집 삭제 handler
-    // handleRowAction(event){
-    //     let actionName = event.detail.action.name;
-    //     //console.log('actionName : ' +actionName);
-    //     let row = event.detail.row;
-    //     //console.log('row : '+row);
-    //     switch(actionName){
-    //         case 'edit':
-    //             this.editCurrentRecord(row);
-    //             break;
-    //         case 'delete':
-    //             this.deleteOpps(row);
-    //             break;
-    //     }
     // }
     
 }

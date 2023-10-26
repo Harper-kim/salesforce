@@ -11,7 +11,7 @@
     <types>
         <members>*</members>
         <name>ApexPage</name>
-    </types>
+    </types>StageName
     <types>
         <members>*</members>
         <name>ApexTestSuite</name>

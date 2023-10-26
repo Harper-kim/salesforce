@@ -1,124 +1,78 @@
-import { LightningElement, wire } from 'lwc';
-
-import getContacts from "@salesforce/apex/contactListViewHelper.getContacts"
-import searchContact from "@salesforce/apex/contactListViewHelper.searchContact"
-import deleteContacts from "@salesforce/apex/contactListViewHelper.deleteContacts"
-
+import { LightningElement,api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import { refreshApex } from '@salesforce/apex';
 
-const ACTIONS = [{label: 'Delete', name: 'delete'}]
+import getAccountId from '@salesforce/apex/ContactController.getAccountId';
 
-const COLS = [{label: 'Name', fieldName: 'link', type: 'url', typeAttributes: {label: {fieldName: 'FullName'}}},
-            {label: 'Email', fieldName: 'Email'},
-            {label: 'Account', fieldName: "accountLink", type: 'url', typeAttributes: {label: {fieldName: 'AccountName'}}},
-            {label: "Mailing Address", fieldName: 'MailingAddress'},
-            { fieldName: "actions", type: 'action', typeAttributes: {rowActions: ACTIONS}}
-]
+const ACTIONS = [{label: 'Edit', value: 'Edit'},
+                {label: 'Delete', value: 'Delete'}]
+
+const columns = [
+    {label: 'Contact Name', fieldName: 'link', type: 'url', typeAttributes: { label: { fieldName: 'Name' }}},
+    {label: 'Title', fieldName: 'Title', type: 'text'},
+    {label: 'Email', fieldName: 'Email', type: 'email'},
+    {label: 'Phone', fieldName: 'Phone', type: 'phone'},
+    {fieldName: 'actions', type: 'actions', typeAttributes: {rowActions: ACTIONS}}
+];
+
+
 
 export default class ContactListView extends NavigationMixin(LightningElement) {
-    cols = COLS;
-    contacts;
-    wiredContacts;
-    selectedContacts;
+    @api recordId;
+    columns = columns;
+    contacts =[];
     baseData;
+    error;
 
-    get selectedContactsLen() {
-        if(this.selectedContacts == undefined) return 0;
-        return this.selectedContacts.length
+    //totalCount;
+    title;
+    
+
+    connectedCallback(){
+        this.viewAll();
     }
 
-    @wire(getContacts)
-    contactsWire(result){
-        this.wiredContacts = result;
-        if(result.data){
-            this.contacts = result.data.map((row) => {
-                return this.mapContacts(row);
+    //전체보기
+    async viewAll(){
+        const result = await getAccountId({ accountId: this.recordId })
+            this.contacts = result.map(row => {
+                return this.mapCons(row);
             })
-            this.baseData = this.contacts;
-        }
-        if(result.error){
-            console.error(result.error);
-        }
+        //this.totalCount = this.contacts.length;
+        this.title = 'Contacts (' +this.contacts.length+ ')';
+        console.log('this.title : ' +this.title);
     }
 
-    mapContacts(row){
-        var accountName = '';
-        var accountLink = '';
-        if(row.AccountId != undefined){
-            accountLink = `/${row.AccountId}`;
-            accountName = row.Account['Name'];
-        }
-
-        var street = row.MailingStreet
-        if(row.MailingStreet == undefined){
-            street = ''
-        }
-        var city = row.MailingCity
-        if(row.MailingCity == undefined){
-            city = ''
-        }
-        var state = row.MailingState 
-        if(row.MailingState == undefined){
-            state = ''
-        }
-        var country = row.MailingCountry 
-        if(row.MailingCountry == undefined){
-            country = ''
-        }
-        var zipCode = row.MailingPostalCode
-        if(row.MailingPostalCode == undefined){
-            zipCode = ''
-        }
-
+    mapCons(row){
         return {...row,
-            FullName: `${row.FirstName} ${row.LastName}`,
-            link: `/${row.Id}`,
-            accountLink: accountLink,
-            AccountName: accountName,
-            MailingAddress: `${street} ${city} ${state} ${zipCode} ${country}`
+            Name: row.Name,
+            link: `/${row.Id}`
         };
     }
 
-    handleRowSelection(event){
-        this.selectedContacts = event.detail.selectedRows;
-    }
-
-    async handleSearch(event){
-        if(event.target.value == ""){
-            this.contacts = this.baseData
-        }else if(event.target.value.length > 1){
-            const searchContacts = await searchContact({searchString: event.target.value})
-
-            this.contacts = searchContacts.map(row => {
-                return this.mapContacts(row);
-            })
-        }
-    }
-
-    navigateToNewRecordPage() {
-
+    //View All
+    viewContacts() {
         this[NavigationMixin.Navigate]({
-            type: 'standard__objectPage',
+            type: 'standard__recordRelationshipPage',
             attributes: {
-                objectApiName: 'Contact',
-                actionName: 'new'
-            }
+                recordId: this.recordId,
+                objectApiName: 'Account',
+                relationshipApiName: 'Contacts',
+                actionName: 'view'
+            },
         });
     }
 
-    handleRowAction(event) {
-        deleteContacts({contactIds : [event.detail.row.Id]}).then(() => {
-            refreshApex(this.wiredContacts);
-        })
+    //RowAction
+    handleRowAction(event){
+        if(actions == 'Delete'){
+           
+       }
+       else if(actions == 'Edit'){
+          
+       }
     }
 
-    deleteSelectedContacts(){
-        const idList = this.selectedContacts.map( row => { return row.Id })
-        deleteContacts({contactIds : idList}).then( () => {
-            refreshApex(this.wiredContacts);
-        })
-        this.template.querySelector('lightning-datatable').selectedRows = [];
-        this.selectedContacts = undefined;
-    }
+    
+   
+
 }

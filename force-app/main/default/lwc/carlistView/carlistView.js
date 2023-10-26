@@ -1,12 +1,17 @@
-import { LightningElement,track,api } from 'lwc';
+import { LightningElement,track, api} from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
 import tireData from '@salesforce/apex/TireController.tireData';
 import searchOpp from '@salesforce/apex/TireController.searchOpp';
-import updateProduct from '@salesforce/apex/TireController.updateProduct';
+import insertProduct from '@salesforce/apex/TireController.insertProduct';
 import getproInfo from '@salesforce/apex/TireController.getproInfo';
+import updateProduct from '@salesforce/apex/TireController.updateProduct';
+import deleteProduct from '@salesforce/apex/TireController.deleteProduct';
 
-const ACTIONS = [{label: 'edit', value: 'edit'}]
+const ACTIONS = [{label: 'edit', value: 'edit'},
+                {label: 'delete', value: 'delete'}]
 
-const colums = [
+const columns = [
     {label: 'Material__c', fieldName: 'Material__c', type: 'text'},
     {label: 'Description__c', fieldName: 'Description__c', type: 'text'},
     {label: 'Description2__c', fieldName: 'Description2__c', type: 'text'},
@@ -27,35 +32,43 @@ const colums = [
 ]
 
 export default class CarlistView extends LightningElement {
-    @api recordId;
-    @api objectName;
-
     @track data;
-    colums = colums;
-
+    columns = columns;
 
     @track isEditModal = false;
+    @track isNewModal = false;
 
+    @track Name;
 
     //전체데이터 불러오기
-    async connectedCallback(){
-        await this.tireAll();
+     connectedCallback(){
+         this.tireAll();
     }
   
-      //전체보기
-      async tireAll(){
-          const result = await tireData();
-          this.data = result.map(row => {
-              return this.mapProducts(row);
-          }) 
-      }
+    //전체보기
+    async tireAll(){
+        this.Name = '';
+        const result = await tireData();
+        this.data = result.map(row => {
+            return this.mapProducts(row);
+        }) 
+    }
 
-      //매핑시켜주는 
-      mapProducts(row){
+    
+
+    //매핑시켜주는 
+    mapProducts(row){
         return {...row,
             Name: row.Name,
             link: `/${row.Id}`,
         };
+    }
+    newModalBox(){
+        this.isNewModal = true;
+    }
+
+    newCloseModalBox(){
+        this.isNewModal = false;
     }
 
     //edit모달 열기
@@ -68,54 +81,117 @@ export default class CarlistView extends LightningElement {
     }
 
     //검색
-    async handleSearch(event){
+     handleSearch(event){
         if(event.target.value){
             console.log(event.target.value);
-            await this.search();
+             this.search();
         }
         else{
-            await this.tireAll();
+             this.tireAll();
         }
     }
 
     //검색된 데이터만 보기
-    async search(){
-        const searchOpps = await searchOpp({searchString: event.target.value});
+     search(){
+        const searchOpps =  searchOpp({searchString: event.target.value});
         this.data = searchOpps.map(row =>{
             return this.mapProducts(row);
         });
     }
-
-    async handleRowAction(event){
-        if(event.detail.action.value == 'edit'){
-            const response = await getproInfo({productId : event.detail.row.Id});
-                this.id = response.Id;
-                this.Name = response.Name;
-                this.Description__c = response.Description__c;
-                this.Description2__c = response.Description2__c;
-            this.editModalBox();
-        }
+    handleNameChange(event){
+        this.Name = event.target.value;
     }
 
-    async handleSave(event){
-        const row = event.detail.row;
-        await updateProduct({
-           ProductId : row.Id,
-           Description: row.Description__c,
-           Description2: row.Description2__c
-        });
-        this.editOpps();
+     handleSave(){
+         insertProduct({
+            name : this.Name
+        })
+        this.saveCreate();
+        this.tireAll();
     }
-    
-    //편집
-    editOpps(){
+
+    saveCreate(event){
         this.dispatchEvent(
             new ShowToastEvent({
                 title: 'Success',
-                message: '기회를 업데이트하였습니다.',
+                message: '생성 되었습니다.',
                 variant: 'success'
-            }),);
-            this.editCloseModalBox();
+            })
+        );
+        this.newCloseModalBox(event);
     }
 
+    //수정,편집(RowAction)
+     handleRowAction(event){
+        if(event.detail.action.value == 'edit'){
+            const response =  getproInfo({productId : event.detail.row.Id});
+                this.id = response.Id;
+                this.Name = response.Name;
+                //value 값을 가져오는 거
+                this.Description__c = response.Description__c;
+                this.Description2__c = response.Description2__c;
+
+                //field Name 업데이트에 저장하는 거
+                this.updescription = response.Description__c;
+                this.updescription2 = response.Description2__c;
+            this.editModalBox();
+        }
+        else if(event.detail.action.value == 'delete'){
+            deleteProduct({productId : event.detail.row.Id});
+                this.saveDelete();
+        }
+    }
+
+    // (Description__c,Description2__c 두컬럼만)
+    handleDescriptionChange(event){
+        this.updescription = event.target.value; 
+    }
+    handleDescription2Change(event){
+        this.updescription2 = event.target.value;
+    }
+
+    //수정 저장 누를시
+     handleUpdateSave(){
+        const result =  updateProduct({
+            productId : this.id,
+            description: this.updescription,
+            description2: this.updescription2
+        });
+       
+        //성공
+        if(result === 'Success') {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: '업데이트가 되었습니다.',
+                    variant: 'success'
+                })
+            );
+            this.editCloseModalBox();
+        }
+        //실패
+        else{
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error',
+                    message: '오류',
+                    variant: 'error'
+                })
+            );
+      
+        }
+        this.editCloseModalBox();
+        this.tireAll();
+    }
+    
+    saveDelete(){
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title:'Success',
+                message:'삭제되었습니다.',
+                variant:'success'
+            })
+        );
+        this.tireAll();
+    }
 }

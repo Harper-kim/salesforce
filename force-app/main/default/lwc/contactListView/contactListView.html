@@ -1,25 +1,23 @@
 <template>
-    <lightning-card title="Custom Contact List View">
-        <div slot="actions">
-            <lightning-button label="Create Contact" onclick={navigateToNewRecordPage}></lightning-button>
-            <lightning-button label="Delete Selected Contacts" onclick={deleteSelectedContacts}></lightning-button>
-
-        </div>
-        <div class="slds-card__body_inner">
-            <p>Selected Contacts: {selectedContactsLen}</p>
-
-            <div class="slds-grid slds-gutters slds-p-bottom_x-small slds-p-left_x-small">
-                <lightning-input type="search" onchange={handleSearch}></lightning-input>
+     <lightning-card title={title} icon-name="standard:contact">
+            <!-- new 버튼 -->
+            <div slot="actions">
+                <lightning-button label="New" ></lightning-button>
+                <lightning-button label="Get More Contacts"></lightning-button>
             </div>
-            <lightning-datatable
-            key-field="id"
-            data={contacts}
-            columns={cols}
-            onrowselection={handleRowSelection}
-            onrowaction={handleRowAction}
-            > 
-            </lightning-datatable>
-        </div>
-
-    </lightning-card>
+            <!--데이터 테이블-->
+            <div class="datatable">
+                <lightning-datatable
+                    key-field="id"
+                    data={contacts}
+                    columns={columns}
+                    onrowaction={handleRowAction}
+                    hide-checkbox-column="true">
+                </lightning-datatable>
+            
+                <footer class="slds-card__footer" style="margin-top:-1px;">
+                    <a class="slds-card__footer-action" onclick={viewContacts}>View All<span class="slds-assistive-text">Contacts</span></a>
+                </footer>
+            </div>
+        </lightning-card>
 </template>

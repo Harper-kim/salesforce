@@ -40,9 +40,24 @@ public with sharing class OpportunityController {
     }
 
     @AuraEnabled
-    public static void updateRecord(){
-       
+    public static Opportunity getOppInfo(String opportunityId){
+
+        Opportunity opp = [SELECT Id, Name, StageName,CloseDate FROM Opportunity WHERE Id =:opportunityId];
+        
+        return opp;
     }
+
+    @AuraEnabled
+    public static void updateOpportunitys(Id opportunityId, String StageName,Date CloseDate){
+        Opportunity opUpdate = [SELECT Id,Name,StageName,CloseDate FROM Opportunity WHERE Id =:opportunityId];
+            opUpdate.StageName = StageName;
+            opUpdate.CloseDate = CloseDate;
+
+            update opUpdate;
+
+    }
+
+
     
        
         

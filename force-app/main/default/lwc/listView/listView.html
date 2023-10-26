@@ -1,0 +1,76 @@
+<template>
+    <div class="slds-box slds-theme_default" onscroll={loadMoreData} style="height: 800px; overflow-y: auto;">
+        <lightning-card  title="Products">
+            <div class="container">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset slds-text-title_caps">
+                            <th  class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="Name">Name</div>
+                            </th>
+                            <th  class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="Desciption">Description</div>
+                            </th>
+                            <th class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="Desciption2">Description2</div>
+                            </th>
+                            <th class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="Division__c">Division__c</div>
+                            </th>
+                            <th class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="Car_Type__c">Car_Type__c</div>
+                            </th>
+                            <th class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="Brand__c">Brand__c</div>
+                            </th>
+                            <th class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="S_Width__c">S_Width__c</div>
+                            </th>
+                            <th class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="Tire_Type__c">Tire_Type__c</div>
+                            </th>
+                            <th class="slds-is-resizable" scope="col">
+                                <div class="slds-truncate" title="Type__c">Type__c</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template if:true={products}>
+                            <template for:each={products} for:item="item">
+                                <tr key={item.Id}>
+                                    <th scope="row" data-label="Product Name">
+                                        <div class="slds-truncate" title={item.Name}>{item.Name}</div>
+                                    </th>
+                                    <th scope="row" data-label="Product Description">
+                                        <div class="slds-truncate" title={item.Description}>{item.Description__c}</div>
+                                    </th>
+                                    <th scope="row" data-label="Product Description2">
+                                        <div class="slds-truncate" title={item.Desciption2__c}>{item.Description2__c}</div>
+                                    </th>
+                                    <th scope="row" data-label="Product Description2">
+                                        <div class="slds-truncate" title={item.Division__c}>{item.Division__c}</div>
+                                    </th>
+                                    <th scope="row" data-label="Product Description2">
+                                        <div class="slds-truncate" title={item.Car_Type__c}>{item.Car_Type__c}</div>
+                                    </th> 
+                                    <th scope="row" data-label="Product Description2">
+                                        <div class="slds-truncate" title={item.Brand__c}>{item.Brand__c}</div>
+                                    </th>
+                                    <th scope="row" data-label="Product Description2">
+                                        <div class="slds-truncate" title={item.S_Width__c}>{item.S_Width__c}</div>
+                                    </th>
+                                    <th scope="row" data-label="Product Description2">
+                                        <div class="slds-truncate" title={item.Tire_Type__c}>{item.Tire_Type__c}</div>
+                                    </th>
+                                     <th scope="row" data-label="Product Description2">
+                                        <div class="slds-truncate" title={item.Type__c}>{item.Type__c}</div>
+                                    </th>
+                                </tr>
+                            </template>
+                        </template>
+                    </tbody>
+                </table>  
+            </div>
+        </lightning-card>
+    </div>
+</template>

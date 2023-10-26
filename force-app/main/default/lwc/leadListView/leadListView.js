@@ -8,7 +8,7 @@ import getRecentList from '@salesforce/apex/LeadRecentListController.getRecentLi
 const columns = [
     { label: '이름', fieldName: 'LeadName', type: 'url',  typeAttributes: { label: {fieldName: 'Name'}, target: '__blank'}},
     { label: '회사', fieldName: 'Company', type: 'text'},
-    { label: '이메일', fieldName: 'Email', type: 'email'},
+    { label: '이메일', fieldName: 'Email', type: 'email', editable: true},
     { label: '상태', fieldName: 'Status', type: 'text'},
     { label: '등급', fieldName: 'Rating', type: 'text'},
     { label: '소유자', fieldName: 'userName__c', type: 'text'},
